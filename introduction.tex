@@ -1,0 +1,93 @@
+\section{Introduction}
+The increase in data size stored in DBMS causes a need to develop new methods
+that provide fast but approximate results to queries. The traditional
+model rely on direct access to data warehouse. It returns precise
+results for a queries. However, it might be too slow due to numerous
+read from the in most cases slow memory. For some applications
+obtaining fast and approximate results is enough.
+This is the reason to develop new methods to access data in the fast way. The authors
+of the paper \cite{GM98} propose new model that make use of the
+approximating answers engine. It relays on storing summary statistics,
+called \textit{synopsis data structures} or \textit{synopses}in
+approximate answer engine. Instead
+directly to database user queries are sent to it.
+Users can then estimate the value of returned
+answer and depending on it decide to query proper database system in
+order to obtain precise results or not. This approach
+is different from the one in which the database is scanned and the approximate
+answer is updated as the scan proceeds.
+The goal is to develop techniques that provide fast response to
+various type of queries. This is achievable by placing frequently used
+structures in memory close to processor (main memory or
+caches). From this follows that it is beneficial to limit size of used
+data structures. This is the reason for considering the effectiveness
+of used data structures as the function of memory footprint. The
+measurement synopsis effectiveness takes into account two factors the
+accuracy of the provided answers and the response time. On of the main
+difficulty related to data structures providing approximated answers is
+keeping them up to data as the content of the  data warehouse changes.
+In this case the algorithms responsible for maintaining appropriate
+structures in presence of inserting and deleting tuples has to be
+developed.
+
+\subsection{Concise and counting samples}
+Gibbons and Matias \cite{GM98} introduced two new sampling summary
+statistics, \textit{concise samples} and \textit{counting
+  samples}. The basic idea seems to be simple. However,
+they also developed techniques to fast incremental maintenance of this
+structure which in face of frequent updates is not trivial.
+
+The idea behind the \textit{concise samples} and \textit{counting
+  samples} is to focus on the class of queries that ask for a one or
+more attributes of data relation. The most rudimentary synopsis data
+structure is selecting a random set of tuples in the relation. Gibbons
+and Matias point out that the frequently occurring values lead to
+inefficiency and it representation is not optimal. Instead they
+proposed to represent frequently occurring values as a pair
+\textit{<v,k>} where \textit{v} represents value and \textit{k}
+number of value copies in the sample. If we assume that value is
+represented by a type that size is equal to an integer numeric
+type. Then we save space for $ k - 2 $ points. This simple idea is a
+base for concise sample data structure. Which is defined as a uniform
+random sample of the data set such that values appearing more than
+once in the sample are represented as a value and a count. Gibbons and
+Matias argues that however, simple this method might be powerful as
+freeing up space let move data to the memory that is closer to the
+processor which substantially reduce access time. What is more this
+technique is never worse (in the sense of occupied memory) that
+rudimentary random samples. The method used to represent concise
+samples might be also seen as a way to improve the quality of
+approximation answer, as the saved memory might be used for additional
+samples. Hence, the result is more accurate.
+
+The number of point and \textit{<v,k>} pairs depends on the data
+distribution. The approximation engine has to keep track of inserts
+and deletion operation and do corresponding updates in its concise
+sample set. It is not easy as in general it can not be easily known
+(without scanning entire database relation) when value becomes
+important enough and should be represented in the sample (as it was
+not tracked before). Gibbons and Matias suggest a probabilistic
+algorithm that that maintains concise sample set within fixed memory
+footprint bound.
+
+The second technique proposed in the paper \cite{GM98} are
+\textit{counting samples}.
+%TODO describe count samples
+
+
+\subsection{Previous techniques}
+By the 1998 there were known some other techniques for gathering
+approximate answers. On of them was \textit{online aggregation}
+proposed by Hellerstein, Hass and Wang. This framework based on
+scanning database on random. The approximate answer is being developed
+and displayed to the user together with confidence interval. It is
+possible to stop the scan in any time. This approach differs from the
+one proposed by Gibbons and Matias \cite[GM98] that base on
+precomputed structures which are synopses. Although, synapses are not
+%TODO be more elaborate on that
+sufficient for all types of aggregation queries the are much faster as
+do not require neither disk accesses which might be slow nor special
+techniques needed to develop access in random order (required for good
+approximation accuracy).
+%describe other techniques know to the authors of the paper
+
