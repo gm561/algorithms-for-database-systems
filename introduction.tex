@@ -1,18 +1,20 @@
 \section{Introduction}
-The increase in data size stored in DBMS causes a need to develop new methods
-that provide fast but approximate results to queries. The traditional
+The increase in data size stored in DBMS and simultaneously a
+requirement to obtain query answers quickly cause a need to develop new methods
+that provide fast but approximate results to this queries. The traditional
 model rely on direct access to data warehouse. It returns precise
 results for a queries. However, it might be too slow due to numerous
-read from the in most cases slow memory. For some applications
-obtaining fast and approximate results is enough.
-This is the reason to develop new methods to access data in the fast way. The authors
-of the paper \cite{GM98} propose new model that make use of the
-approximating answers engine. It relays on storing summary statistics,
-called \textit{synopsis data structures} or \textit{synopses}in
+reads from the hard disk (if data stored are so big that they do not
+fit in caches or memory). For some applications
+obtaining fast but approximate results is enough.
+This is the reason to develop new methods to access data in the fast
+way without accessing hard drive. The authors
+in the paper \cite{GM98} propose new model that makes use of the
+approximate answers engine. It relays on storing summary statistics,
+called \textit{synopsis data structures} or \textit{synopses} by
 approximate answer engine. Instead
-directly to database user queries are sent to it.
-Users can then estimate the value of returned
-answer and depending on it decide to query proper database system in
+directly to database user's queries are sent to approximate answers engine.
+When obtained the result, users can estimate it usefulness and depending on it decide to query proper database system in
 order to obtain precise results or not. This approach
 is different from the one in which the database is scanned and the approximate
 answer is updated as the scan proceeds.
