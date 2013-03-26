@@ -1,0 +1,19 @@
+\section{Counting Samples}
+Counting samples is another approach presented by Gibbons and Matias
+\cite{GM98}. The idea is similar to the one behind the concise
+samples. The definition of the $count$ is refined. Namely, the counts
+are used to track all occurrences of a value inserted into the
+relation since the value was selected for the sample. The counting
+samples might be understood as the random experiment in which for each
+attribute value that occurs $c$ times in relation $R$ the biased coin
+with probability of heads $\frac{1}{\tau}$ is flipped till the first
+head. If we denote by $i$ the number of tosses till the first head
+then the $count$ equals $c - i + 1$. If there is no head in $c$ throws
+then the value does not show up in the sample. Similarly as for the
+concise sample the value for which count is greater than one is
+represented as a pair $\langle value, count \rangle$. Values for
+which count is exactly one are represented by singleton
+$value$. Clearly, the values for which count is zero are not
+represented in the sample. The counting samples are not uniformly
+distributed but it is possible to obtain concise sample from counting
+samples. To do that, the following algorithm might be used
