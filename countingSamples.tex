@@ -16,4 +16,68 @@ which count is exactly one are represented by singleton
 $value$. Clearly, the values for which count is zero are not
 represented in the sample. The counting samples are not uniformly
 distributed but it is possible to obtain concise sample from counting
-samples. To do that, the following algorithm might be used
+samples. To do that, it is enough to toss a biased coin with head
+probability $\frac{1}{\tau}$ $count - 1$ times. The concise sample is
+the counting sample for which the $coutn$ is reduced by the number of
+tails in the above random experiment. Obviously, if the $count$ is
+reduced to one, sample is represented by a singleton. Similarly, if the
+$count$ is reduced to zero the sample is not represented.
+
+\subsection{Incremental algorithm for maintenance of counting samples}
+Similarly as it was in the  case of concise samples Gibbons and Matias
+propose an algorithm for maintaining samples in presence of inserts to
+data warehouse. The algorithm was briefly presented on the following
+code excerpt
+
+\begin{algorithm}[H]
+  \caption{Incremental maintenance of counting samples}
+  \label{alg:maintenace-counting-algorithm}
+  \textbf{Input:} Tuple $t$ to be inserted
+  \begin{algorithmic}
+  \Function{InsertTuple}{$t$}
+  \If{$t.A$ is a pair $\langle value, count \rangle$ in $S$}
+  \State Increment by one $count$ in $\langle value, count \rangle$
+  \ElsIf{$t.A$ is a singleton in $S$}
+  \State Remove singleton $value$ corresponding to $t.A$ from $S$
+  \State Insert $\langle t.A, 2 \rangle$ into $S$
+  \ElsIf{$t.A$ is not present in $S$}
+  \State {Add $t.A$ as singleton value with propbability $\frac{1}{\tau}$}
+  \EndIf
+  \If{$footprint(S) > m$}
+  \State {MakeSpace()}
+  \EndIf
+  \EndFunction
+  \State{}
+  %MakeSpace function
+  \Function{MakeSpace}{}
+  \State{Raise threshold to $\tau'$}
+  \ForAll{s in $S$}
+  \State{$count' = 0$}
+  \State {Flip a coin with probability of head $\frac{\tau}{\tau'}$}
+  \While{Tail is flipped}
+  \State{$count' \gets count' + 1$}
+  \EndWhile
+  \State{$s.count \gets s.count - count'$ }
+  \If{$s.count = 0$}
+  \State{Remove $s$ from $S$}
+  \ElsIf{$c.count = 1$ and $s$ is a pair}
+  \State{Remove $s$ from $S$}
+  \State{Insert singleton corresponding to $s$ into $S$}
+  \Else
+  \State{Update the pair corresponding to $s$ with new $count$ value}
+  \EndIf
+  \EndFor
+  \EndFunction
+\end{algorithmic}
+
+\end{algorithm}
+As one can see this algorithm is similar to the one already described
+for concise samples. Careful reader might observed that we did not
+provided any solution in case of delation of tuples form data
+warehouse for concise samples. Actually this is the motivation for
+introducing the counting samples. Delating concise samples in hard. If
+we omit delation, it is possible that there exists a representation of
+a tuple in the sample but this tuple is no longer present in the data
+warehouse. On contrary if we update/remove sample on each delation,
+the sample representation is not longer a distribution that
+corresponds to the one of data stored in data warehouse. 
