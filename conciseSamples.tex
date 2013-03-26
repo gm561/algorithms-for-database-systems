@@ -69,21 +69,25 @@ not removed from the relation). As a result of its execution we obtain
 an approximation of tuples distribution in the relation.
 
 \subsection{Incremental maintenance of concise samples}
-The algorithm \ref{alg:offline-concise-algorithm} requires disk
-accesses. As a result updating the structures is slow. That is ways
-the \cite{GM98} presented another algorithm that requires no disk
-accesses and let maintain sampling frequency of concise samples that
-reflects distribution of tuples in the relation in data base system.
-The novelty of Gibbons and Matias approach in comparison to previous
-works follows form the fact that this algorithm do not assume that
-the sample-size is know up-front (i.e. it differs from the footprint).
+The \textbf{Algorithm \ref{alg:offline-concise-algorithm}} requires
+linear number of disk
+accesses. As a result updating the structures is slow. That is why
+the \cite{GM98} presents an online algorithm that requires no disk
+accesses and maintains sampling frequency of concise samples that
+reflects distribution of tuples stored in the relation in data base system.
 %TODO maybe describe previous approach ?
+%TODO read the paper by Vitter and compare this work to it.
+The novelty of Gibbons and Matias approach in comparison to previous
+works follows from the fact that this algorithm do not assume that
+sample-size is know up-front (i.e. it differs from the footprint).
 The sample-size depends not only on the footprint but also on data
-distribution. As data distribution in general can not be forseen, we
-do not know how many different samples we are going to actually store.
+distribution. As distribution in general is not known at the beginning
+and might change in time, it is actually not known how many different
+samples will be stored. The following algorithm maintains concise
+samples during insertion
 
 \begin{algorithm}
-  \caption{Offline/static concise sample computation}
+  \caption{Incremental maintenance of concise samples.}
   \label{alg:maintenance-concise-algorithm}
   \begin{algorithmic}
     \LineComment{$\tau$ - entry threshold}
@@ -100,27 +104,107 @@ do not know how many different samples we are going to actually store.
     \ElsIf{$isAdded = true$ and $t$ present in $S$}
     \State {increase $count$ by one in the pair $\langle t.A, count \rangle$}
     \EndIf
+    \If{footprint of $S > m$}
+    \State{call MakeSpace()}
+    \EndIf
     \EndFunction
-  \end{algorithmic}
-
-  \caption{Offline/static concise sample computation}
-  \label{alg:make-space-concise-algorithm}
-  \begin{algorithmic}
-    \Function{MakeSpace}{$\tau$}
+    \State 
+    \Function{MakeSpace}{}
     \State {Raise the threshold to some $\tau'$}
     \ForAll{$s$ in $S$}
     \If{$s$ is a singleton value in $S$}
     \State {remove s from $S$ with probability
       $\frac{\tau'}{\tau}$}
     \ElsIf{$s$ is a pair $\langle value, count \rangle$ in $S$}
-    \State{$count' \gets 0$ }
+    \State{$count' \gets 0$}
     \For{$i = 1 \to count$}
     \State{increase $count'$ with probability $\frac{\tau'}{\tau}$}
     \EndFor
+    \State{$count \gets count - count'$}
+    \If{$count = 0$}
+    \State{remove $\langle value, count \rangle$ from $S$}
+    \ElsIf{$count = 1$ and $value$ is represented as a pair}
+    \State{Remove pair $\langle value, count \rangle$ from $S$}
+    \State{Insert singleton $value$ into $S$}
+    \EndIf
     \EndIf
     \EndFor
+    \State {$\tau \gets \tau'$}
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
+%TODO add more detail description of the algorithm.
+The key invariant of the \textbf{Algorithm
+  \ref{alg:maintenance-concise-algorithm}} is that each tuple is in
+represented in concise sample as if the current value of the threshold
+$\tau$ were always constant. In other words probability of a tuple being
+represented in concise sample is equal $\frac{1}{\tau}$ even if the
+$\tau$ has been changing in the past. Gibbons and Matias \cite{GM98} provide proof
+of this invariant which seems to be not fully correct. Below this
+proof has been sketch.
+\begin{theorem}
+Each tuple in the relation is treated as the invariant was always
+$\tau$ even if it has changed from some $\tau'$ to $\tau$.
+\end{theorem}
+\begin{proof}
+Let $X_{t\tau}$ be an indicator random variable of the event that tuple
+t is in the sample when the threshold is $\tau$. Clearly, we have
+\begin{align*}
+P(X_{t\tau} = 1) = \frac{1}{\tau}
+\end{align*}
+The probability of the tuple $t$ to be in the sample after changing a
+threshold to $\tau'$ equals
 
+\begin{align*}
+  P(X_{t\tau'} = 1) &= P(X_{t\tau'} = 1 | X_{t\tau} = 1) P(X_{t\tau} = 1)
+  + P(X_{t\tau'} = 1 | X_{t\tau} = 1) P(X_{t\tau} = 1) \\
+  &=  P(X_{t\tau'} = 1 | X_{t\tau} = 1) P(X_{t\tau} = 1) \\
+  &= \frac{\tau}{\tau'} \frac{1}{\tau} = \frac{1}{\tau'}.
+\end{align*}
+\end{proof}
+Hence, if the current threshold is $\tau$, the probability of a tuple
+to be in the sample equals $\frac{1}{\tau}$ . The only problem
+with this proof is that the authors in \cite{GM98} define the
+probability of evicting a sample to be
+\begin{align*}
+P(X_{t\tau'} = 0 | X_{t\tau} = 1) = \frac{\tau}{\tau'}.
+\end{align*}
+It also follows from the
+\textbf{Algorithm \ref{alg:maintenance-concise-algorithm}}. I assume
+that this is just a slight inconsistency and in fact a tuple after
+change of threshold should
+remain in the sample given that it is in the sample before the
+threshold was changed with probability $\frac{\tau'}{\tau}$.
+
+It is possible that flipping a coin for each insertion of new data can
+create certain overhead. Basing on the reservoir sampling Algorithm X
+\cite{Vit85} Gibbons and Matias propose an approach in which a coin is
+flipped in order to determine how many consecutive inserts will be
+omitted. This idea bases on generating a value for a random
+variable with give distribution. As it is known that the probability
+of skipping over exactly next $i$ elements is
+\begin{align*}
+P(\text{skip over exactly next $i$ elements}) = \left( 1 - \frac{1}{\tau}\right)^i\frac{1}{\tau}
+\end{align*}
+%TODO describe algorihtm for skipping over elements described in
+%vitter...
+%TODO add an example that show exponential advantage of concise
+%samples page 334.
+
+\subsection{Experimental evaluation}
+Gibbons and Matias \cite{GM98} compared the Algorithms
+\ref{alg:offline-concise-algorithm}, \ref{alg:maintenance-concise-algorithm} with approach
+when a random sample is maintained using the reservoir
+algorithm, in which case the sample size is equal to the footprint.
+
+The experimental results for the Zpif distribution shows that in
+general the overhead connected with choosing a threshold is not
+critical. Gibbons and Matias \cite{GM98} used simple model in which
+the threshold is increase by $10\%$ of the previous one. It turned out
+that even using such a simple model the difference between offline
+Algorithm \ref{alg:offline-concise-algorithm} and the maintenance
+Algorithm \ref{alg:maintenance-concise-algorithm} are not
+big. It would be possible to achieve even better results when for
+example a binary search would be used to find an optimal
+threshold. 
