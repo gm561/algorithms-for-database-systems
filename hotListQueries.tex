@@ -23,16 +23,22 @@ scaled by $\frac{n}{m}$, where $\sigma$ is a confidential threshold.
 %after choosing it ? and why they are scaled?
 
 \subsubsection{Concise samples}
+First we have to find the $k$'th largest count. Let us denote it by
+$c_k$. All pairs that $count$ is at least $max(c_k, \sigma)$ are in
+the sample. The $count$s are then scaled by $\frac{n}{m'}$ where $m'$
+is the sample-size of the concise sample.
+%what happens in the case of \sigma = 1.
 For maintaining a sample the \textbf{Algorithm
-  \ref{alg:offline-concise-algorithm}} is used. Then the $k$'th
-largest $count$ $c_k$ is found. All pairs that $count$ is at least are
-treated as \textit{hot queries}.
-%TODO more precise description
+  \ref{alg:offline-concise-algorithm}} is used.
+
 \subsubsection{Counting samples}
+The approach for determining approximate hot list is similar to the
+one presented above for concise samples. Namely, the $c_k$ is
+determined, all pairs that $count$ is at least $max(c_k, \sigma)$ are
+selected. What is different is the methods for scaling the counts.
+
 For creating a sample the \textbf{Algorithm
-  \ref{alg:maintenace-counting-samples}}. For obtaining the
-\textit{hot list queries} we use the same algorithm as for concise
-samples.
+  \ref{alg:maintenace-counting-samples}}.
 
 \subsubsection{Full histogram on disk}
 This algorithm is used as a baseline for the algorithms presented
