@@ -29,10 +29,8 @@ propose an algorithm for maintaining samples in presence of inserts to
 data warehouse. The algorithm was briefly presented on the following
 code excerpt
 
-\begin{algorithm}[H]
-  \caption{Incremental maintenance of counting samples}
-  \label{alg:maintenace-counting-algorithm}
-  \textbf{Input:} Tuple $t$ to be inserted
+\begin{center}
+  \captionof{algorithm}{Incremental maintenance of counting samples}\label{alg:maintenace-counting-samples}
   \begin{algorithmic}
   \Function{InsertTuple}{$t$}
   \If{$t.A$ is a pair $\langle value, count \rangle$ in $S$}
@@ -69,15 +67,60 @@ code excerpt
   \EndFor
   \EndFunction
 \end{algorithmic}
+\end{center}
 
-\end{algorithm}
 As one can see this algorithm is similar to the one already described
 for concise samples. Careful reader might observed that we did not
-provided any solution in case of delation of tuples form data
-warehouse for concise samples. Actually this is the motivation for
-introducing the counting samples. Delating concise samples in hard. If
-we omit delation, it is possible that there exists a representation of
+provided any solution for concise samples in case when tuples are delated from data
+warehouse. Actually this is the motivation for
+introducing the counting samples. Delating concise samples is hard. If
+the delation is omitted, it is possible that there exists a representation of
 a tuple in the sample but this tuple is no longer present in the data
-warehouse. On contrary if we update/remove sample on each delation,
-the sample representation is not longer a distribution that
-corresponds to the one of data stored in data warehouse. 
+warehouse. On contrary if we update or remove sample on each delation,
+the sample representation is no longer a distribution that
+corresponds to the one of data stored in data warehouse.
+This is the motivation for introducing counting samples.
+Gibbons and Matias \cite{GM98} prove the following theorem for counting samples:
+
+\begin{theorem}
+The algorithm \textbf{Algorithm \ref{alg:maintenace-counting-samples}}
+for any sequence of insertions and deletions maintain properties of
+counting samples.
+\end{theorem}
+\begin{proof}
+  For insertions the properties of counting samples are trivially
+  fulfilled. Namely, in case when tuple is present in the samples, we
+  the count is incremented by one. When, tuple is not present in the
+  samples, the algorithm flips a coin to check whether the tuple
+  should be added to the samples.
+  %TODO what in the case when footprint is too ?
+
+  Similarly for a delation of value $v$ from the relation two cases
+  have to be considered. In the first one, when value is represented
+  in the counting sample then the count is decremented. It may fall
+  till 0, then the value is removed. It might also drop to 1, when the
+  value representation is changed into the singleton. In case the
+  value is not present in the sample then it might be simply omitted.
+
+  In case of raising the threshold from $\tau$ to $\tau'$ Gibbons and
+  Matias claim that if the value is not in the sample, which means
+  that $c$ coin flips came up tails, then it should also not be in the
+  sample after increasing the threshold. In the situation when a value
+  is represented in the sample and its count is $c'$, then we know
+  that for $c - c'$ tails were flipped. As we raised the threshold
+  the outcome of this flips should remain unchanged. Then in the next
+  coin toss the head is observed. We redo the flip with the head
+  probability $\frac{\tau}{\tau'}$. Hence, we have that probability of
+  obtaining a head in this random experiment is
+  \begin{align*}
+    P \left(  \text{the result of a coin toss is head} \right) =
+    \frac{\tau}{\tau'} \cdot \frac{1}{\tau} = \frac{1}{\tau'}.
+  \end{align*}
+  If the outcome of this coin toss is tail, we continue to flip
+  till the first head (but at most $c' - 1$ times) with probability
+  $\frac{1}{\tau'}$.
+
+  It is easy to show that from this in all cases follows that
+  properties of counting samples are maintained.
+\end{proof}
+

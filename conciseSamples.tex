@@ -39,9 +39,9 @@ concise samples from the static relation residing on a disk.
 By $n$ we denote the number of tuples in the relation, $m$ is the
 maximum footprint and $S$ is a concise sample set.
 
-\begin{algorithm}
-  \caption{Offline/static concise sample computation}
-  \label{alg:offline-concise-algorithm}
+\begin{center}
+  \captionof{algorithm}{Offline/static concise sample computation}
+    \label{alg:offline-concise-algorithm}
 \begin{algorithmic}
   \State $m \gets$ maximum footprint
   \State $n \gets$ number of tuples in the relations
@@ -60,7 +60,7 @@ maximum footprint and $S$ is a concise sample set.
     \EndIf
     \EndWhile
   \end{algorithmic}
-\end{algorithm}
+\end{center}
 
 Let $m'$ be the sample-size of $S$. Then the above algorithm requires
 $\Theta(m')$ number of disk accesses. This algorithm might be seen
@@ -86,10 +86,10 @@ and might change in time, it is actually not known how many different
 samples will be stored. The following algorithm maintains concise
 samples during insertion
 
-\begin{algorithm}
-  \caption{Incremental maintenance of concise samples.}
-  \label{alg:maintenance-concise-algorithm}
-  \begin{algorithmic}
+\begin{center}
+  \captionof{algorithm}{Incremental maintenance of concise samples.}
+    \label{alg:maintenance-concise-algorithm}
+    \begin{algorithmic}
     \LineComment{$\tau$ - entry threshold}
     \LineComment{$t$ new added tuple}
     \LineComment{$S$ current concise sample}
@@ -108,7 +108,7 @@ samples during insertion
     \State{call MakeSpace()}
     \EndIf
     \EndFunction
-    \State 
+    \State
     \Function{MakeSpace}{}
     \State {Raise the threshold to some $\tau'$}
     \ForAll{$s$ in $S$}
@@ -132,7 +132,7 @@ samples during insertion
     \State {$\tau \gets \tau'$}
     \EndFunction
   \end{algorithmic}
-\end{algorithm}
+\end{center}
 
 %TODO add more detail description of the algorithm.
 The key invariant of the \textbf{Algorithm

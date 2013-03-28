@@ -1,31 +1,40 @@
 \section{Introduction}
-The increase in data size stored in DBMS and simultaneously a
-requirement to obtain query answers quickly cause a need to develop new methods
-that provide fast but approximate results to this queries. The traditional
-model rely on direct access to data warehouse. It returns precise
-results for a queries. However, it might be too slow due to numerous
-reads from the hard disk (if data stored are so big that they do not
-fit in caches or memory). For some applications
-obtaining fast but approximate results is enough.
-This is the reason to develop new methods to access data in the fast
-way without accessing hard drive. The authors
-in the paper \cite{GM98} propose new model that makes use of the
-approximate answers engine. It relays on storing summary statistics,
-called \textit{synopsis data structures} or \textit{synopses} by
-approximate answer engine. Instead
-directly to database user's queries are sent to approximate answers engine.
-When obtained the result, users can estimate it usefulness and depending on it decide to query proper database system in
-order to obtain precise results or not. This approach
-is different from the one in which the database is scanned and the approximate
-answer is updated as the scan proceeds.
-The goal is to develop techniques that provide fast response to
-various type of queries. This is achievable by placing frequently used
-structures in memory close to processor (main memory or
-caches). From this follows that it is beneficial to limit size of used
-data structures. This is the reason for considering the effectiveness
-of used data structures as the function of memory footprint. The
-measurement synopsis effectiveness takes into account two factors the
-accuracy of the provided answers and the response time. On of the main
+The increase in data size stored in data warehouse and simultaneous
+requirement to obtain query answers within a reasonable time, cause a
+need to develop new methods that provide fast but possibly approximate
+results. The traditional model rely on a direct access to data
+warehouse. In many applications it is too slow due to numerous
+operation involving the time costly access to a hard disk. For some applications
+obtaining results quickly even if they are only approximated
+constitute considerable alternative.
+This is the motivation for developing new methods that return quickly
+approximate answers. The authors of the paper \cite{GM98} propose a
+new model that bases on
+approximate answers engine that is responsible for storing sample based summary statistics,
+called \textit{synopsis data structures} or \textit{synopses}. Instead
+directly to database queries are sent to approximate answers
+engine which basing on the synopses return an approximate result.
+Working set of the approximate query engine is much slower. Therefore,
+it uses high level caches which latency is much lower than a hard disk.
+The users after obtaining results can estimate their usefulness and depending on it
+decide whether to query proper database in order to obtain precise answers or not.
+The novelty of the techniques developed by Gibbons and Matias
+\cite{GM98} base on developing a model that provides samples to
+approximate answer engine which reflects distribution of
+data stored in database and simultaneously maintain its small working set.
+This approach differs from the previous ones in which either the
+entire database is scanned and the approximate answer is updated as
+the scan proceeds or the techniques in which samples set is created in
+less memory-efficient way. The goal of Gibbons and Matias \cite{GM98}
+is to develop techniques that provide fast response to various type of
+queries. This is achievable by placing frequently used structures in
+memory close to processor (main memory or caches). From this follows
+that it is beneficial to limit size of used data structures. This is
+the reason for considering the effectiveness of used data structures
+as the function of memory footprint and number of tuples represented
+in the sample. Additionally, the measurement of synopsis effectiveness
+should takes into account two factors - the
+accuracy of the provided answers and the response time. One of the main
 difficulty related to data structures providing approximated answers is
 keeping them up to data as the content of the  data warehouse changes.
 In this case the algorithms responsible for maintaining appropriate
