@@ -1,0 +1,45 @@
+\section{Hot list queries}
+Gibbons and Matias consider application of concise and counting
+samples in the context of choosing $k$ most frequently occurring
+values which known as \textit{hot list queries}. Formally it might be
+understood as finding $k$ $\langle value, count \rangle$ pairs for
+which $count$ is the largest.
+
+\subsection{Algorithms}
+Gibbons and Matias \cite{GM98} compared four algorithm for creating
+\textit{hot list queries}. The assumption is that we have a relation
+$R$ with $n$ tuples and the footprint bound is $m$, where $m \geq 2k$.
+%TODO describe confidential threshold $\sigma$
+
+\subsubsection{Traditional samples}
+This approach base on Vitter's reservoir sampling algorithm
+\cite{Vit85}.
+%TODO describe algorithms of Vitter's more preciesly
+%actually there are four of them it is not mentioned which one is
+%chosen.
+All pairs with $max(c_k, \sigma)$ are reported. Then the counts are
+scaled by $\frac{n}{m}$, where $\sigma$ is a confidential threshold.
+%TODO this is really unclear what is scaled ? the counts ? before
+%after choosing it ? and why they are scaled?
+
+\subsubsection{Concise samples}
+For maintaining a sample the \textbf{Algorithm
+  \ref{alg:offline-concise-algorithm}} is used. Then the $k$'th
+largest $count$ $c_k$ is found. All pairs that $count$ is at least are
+treated as \textit{hot queries}.
+%TODO more precise description
+\subsubsection{Counting samples}
+For creating a sample the \textbf{Algorithm
+  \ref{alg:maintenace-counting-samples}}. For obtaining the
+\textit{hot list queries} we use the same algorithm as for concise
+samples.
+
+\subsubsection{Full histogram on disk}
+This algorithm is used as a baseline for the algorithms presented
+above. It build a full histogram which means that all possible
+$\langle value, count \rangle$ pairs are created and stored. Then the
+set of the $k$ most frequently occurring is chosen. The remaining are
+still stored and used in presence of update. As the working set of
+this algorithm might be of $\O(n)$ it is not considered to be
+very useful in real applications. However, it provides precise results
+and can be used as a baseline for other methods.
