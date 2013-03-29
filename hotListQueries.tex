@@ -12,33 +12,46 @@ $R$ with $n$ tuples and the footprint bound is $m$, where $m \geq 2k$.
 %TODO describe confidential threshold $\sigma$
 
 \subsubsection{Traditional samples}
-This approach base on Vitter's reservoir sampling algorithm
-\cite{Vit85}.
-%TODO describe algorithms of Vitter's more preciesly
+This approach base on obtaining a sample by means of Vitter's reservoir sampling algorithm
+\cite{Vit85}. The values in the sample are replaced by pairs $\langle
+value, count \rangle$. Then the $k$th largest count $c_k$ is
+found. All counts are scaled by $\frac{n}{m}$ and pairs that count is
+at least $max(c_k, \sigma)$ are treated as being on the list of hot
+queries. It is possible that the sample contains less than $k$
+distinct values. In this case less than $k$ different values are
+contained on the $hot query list$.
+
+%TODO how the list is maintained
+
+%TODO describe algorithms of Vitter's more precisely
 %actually there are four of them it is not mentioned which one is
 %chosen.
-All pairs with $max(c_k, \sigma)$ are reported. Then the counts are
-scaled by $\frac{n}{m}$, where $\sigma$ is a confidential threshold.
 %TODO this is really unclear what is scaled ? the counts ? before
 %after choosing it ? and why they are scaled?
 
 \subsubsection{Concise samples}
-First we have to find the $k$'th largest count. Let us denote it by
-$c_k$. All pairs that $count$ is at least $max(c_k, \sigma)$ are in
-the sample. The $count$s are then scaled by $\frac{n}{m'}$ where $m'$
-is the sample-size of the concise sample.
-%what happens in the case of \sigma = 1.
-For maintaining a sample the \textbf{Algorithm
-  \ref{alg:offline-concise-algorithm}} is used.
+Concise sample is obtain using the \textbf{Algorithm
+  \ref{alg:offline-concise-algorithm}}.
+Then the $k$'th largest count is found. Let us denote it by
+$c_k$. The counts are scaled by $\frac{n}{m'}$ where $m'$ is the
+sample-size. All pairs that $count$ is at least $max(c_k, \sigma)$ are
+treated as \textit{hot queries}. The $count$s are then scaled by $\frac{n}{m'}$ where $m'$
+is the sample-size of the concise sample. This algorithm for
+$\sigma = 1$ will report all k pairs. For larger $\sigma$ it is
+possible that fewer than $k$ values is reported.
 
 \subsubsection{Counting samples}
-The approach for determining approximate hot list is similar to the
+In this case a sample is found by means of the \textbf{Algorithm
+  \ref{alg:maintenace-counting-samples}}. The approach to establish
+approximate \textit{hot list queries} is similar to the
 one presented above for concise samples. Namely, the $c_k$ is
-determined, all pairs that $count$ is at least $max(c_k, \sigma)$ are
-selected. What is different is the methods for scaling the counts.
+determined, all pairs that $count$ is at least $max(c_k, \tau - \widetilde{c})$ are
+selected. The difference is the methods for scaling the counts.
+We need to determine a compensating factor $\widetilde{c}$ for values
+prior the first head was flipped. We base the analysis on the
+transformation of counting samples into concise sample which gives
+$\sigma = 2 - \frac{\widetilde{c}+1}{\tau}$.
 
-For creating a sample the \textbf{Algorithm
-  \ref{alg:maintenace-counting-samples}}.
 
 \subsubsection{Full histogram on disk}
 This algorithm is used as a baseline for the algorithms presented
@@ -49,3 +62,14 @@ still stored and used in presence of update. As the working set of
 this algorithm might be of $\O(n)$ it is not considered to be
 very useful in real applications. However, it provides precise results
 and can be used as a baseline for other methods.
+
+\subsubsection{Confidential threshold $\sigma$}
+The approximation methods are intrinsically associated with the
+error. To bound it the threshold value $\sigma$ is used. For
+traditional methods and concise samples the $\sigma$ is represented by
+the integer. It might be understood as the confidence level which
+indicates that the value should be reported as a \textit{hot list
+  query}. Intuitively the higher the $\sigma$ that less possible is
+that a relatively rarely represented value is listed as hot query. On
+the other hand the higher it is more likely that the sample provides
+less than $k$ values. It is interesting to estimate probability for 

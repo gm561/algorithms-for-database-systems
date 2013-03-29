@@ -1,93 +1,105 @@
 \section{Concise Samples}
-The goal of the algorithm that maintain set of \textit{concise
-  samples} is to obtain a uniform random sample set of $R.A$ values.
-The concise sample might be represented by two structures. It might be
+
+The number of $\langle value, count \rangle$ pairs or singletons
+$values$ that form the representation of a concise sample depends on the data
+distribution in data warehouse. The approximation engine has to keep track of inserts
+operation and when the occurs update correspondingly its data structures.
+The main difficultly is to recognize, without scanning
+entire data warehouse, when a not tracked value becomes important enough to be
+represented in the sample. Gibbons and Matias suggest a probabilistic
+algorithms that maintains concise sample set within fixed memory
+footprint bound.
+
+As it was already mentioned in the introduction the concise sample
+consists of two types of structures. It is
 either a pair $\langle value, count \rangle $ or a singleton value. The first
-type is used for values that occurs in the sample set more than once
+type is used for values that occurs in the sample more than once
 (i.e $count > 1$). The values that are present only once in the sample
-set are represented just by $value$. The motivation for this
-approach is obviously saving space. As a result for sample size may be
-much larger than memory footprint of concise sample. We have that if 
+are represented by singleton $value$. The motivation for this
+approach is saving space. As a result sample size may be
+much larger than memory footprint of concise sample. Let $S$ denote
+concise sample then we have
 \begin{align*}
   S = {\langle v_1, c_1 \rangle, \dots, \langle v_j, c_j \rangle,
     v_{j+1}, \dots, v_l }
 \end{align*}
 is a concise sample where values between $1$ and $j$ are $\langle
 value, count \rangle$ pairs and values $v_{j+1}, \dots, v_l$ are
-singletons, then the we define $sample-size(S)$ as
+singletons, then the we define $sample \hyph size(S)$ as
 \begin{align*}
-sample-size(S) = l - j + \sum_{i=1}^j c_i
+sample \hyph size(S) = l - j + \sum_{i=1}^j c_i
 \end{align*}
-and memory $footprint(S)$ as 
+and memory $footprint(S)$ as
 \begin{align*}
 footprint(S) = l + j.
 \end{align*}
 
-The approach presented by Gibbons and Matias focuses mostly on random
-sample sets of a single attribute of some relation
-i.e. \textit{R.A}. They claim that it is possible to generalize their
-approach for samples sets with pair of attributes. However, it
-leads to much bigger values space i.e $ |R.A0| \times |R.A1|$
-where by $|R.Ai|$ we denote the number of possible values taken by
-attribute $R.Ai$. A concise sample is treated as a uniform sample of
-size $sample-size(S)$ and might be used in any sample-base methods for
+Gibbons and Matias focus mostly on random
+sample sets of a single attribute of a relation.
+They claim that it is possible to generalize this
+approach for samples sets with pair or more attributes. However, it
+leads to much bigger values space i.e $ |R.A_0| \times |R.A_1| \times
+\dots |R.A_N|$ where $|R.A_i|$ denotes the number of possible values taken by
+attribute $A_i$ in relation $R$. A concise sample is treated as a uniform sample of
+size $sample \hyph size(S)$ and might be used in any sample-base method for
 providing approximate query answers.
 
-\subsection{Offline/static computation concise samplesalgorithm}
-Gibbons and Matias \cite{GM98} proposed the an algorithm that extracts
+\subsection{Algorithm for offline computation of concise samples }
+Gibbons and Matias \cite{GM98} propose an algorithm that extracts
 concise samples from the static relation residing on a disk.
-By $n$ we denote the number of tuples in the relation, $m$ is the
-maximum footprint and $S$ is a concise sample set.
+Let $n$ denote the number of tuples in the relation, $m$ the
+maximum footprint, $t$ a tuple in relation $R$, $t.A$ an attribute $A$
+of tuple $t$ and $S$ a concise sample. The following algorithm
+compute a concise sample
 
 \begin{center}
-  \captionof{algorithm}{Offline/static concise sample computation}
+  \captionof{algorithm}{Offline concise sample computation.}
     \label{alg:offline-concise-algorithm}
 \begin{algorithmic}
   \State $m \gets$ maximum footprint
-  \State $n \gets$ number of tuples in the relations
+  \State $n \gets$ number of tuples in the relation
   \State $S \gets  \varnothing$
-  \While{$footprint(S) \leq m $ or $sample-size(S) \leq n$}
-    \State $T \gets$ randomly chose tuple from the relation $R$
-    \State $value(A) \gets$ extract attribute $R.A$ from tuple $T$
-    \If {$value(A)$ is represented by singleton value in $S$}
-        \State remove singleton $value(A)$ from S.
-        \State put pair $\langle value(A), 2 \rangle$ to $S$
-    \ElsIf {$value(A)$ is represented by a pair in $S$}
-        \State increase $count$ in $\langle value(A), count
+  \While{$footprint(S) \leq m $ or $sample \hyph size(S) \leq n$}
+    \State $t \gets$ randomly chosen tuple from the relation $R$
+    \If {$t.A$ is represented by singleton value in $S$}
+        \State remove singleton $t.A$ from S.
+        \State put pair $\langle t.A, 2 \rangle$ to $S$
+    \ElsIf {$t.A$ is represented by a pair in $S$}
+        \State increase $count$ in $\langle t.A, count
         \rangle \gets$ by one.
     \Else
-        \State add singleton $\angle value(A) \rangle$ to $S$
+        \State add singleton $\angle t.A \rangle$ to $S$
     \EndIf
     \EndWhile
   \end{algorithmic}
 \end{center}
 
 Let $m'$ be the sample-size of $S$. Then the above algorithm requires
-$\Theta(m')$ number of disk accesses. This algorithm might be seen
-as drawing with replacement (i.e. the chosen tuples are
-not removed from the relation). As a result of its execution we obtain
-an approximation of tuples distribution in the relation.
+$O(m')$ number of disk accesses. This algorithm might be seen
+as drawing with replacement - the once drawn tuples are
+not removed and can be drawn again. As a result of the execution of
+Algorithm \ref{alg:offline-concise-algorithm} we obtain
+a sample that is an approximation of tuples distribution in the relation.
 
-\subsection{Incremental maintenance of concise samples}
-The \textbf{Algorithm \ref{alg:offline-concise-algorithm}} requires
-linear number of disk
-accesses. As a result updating the structures is slow. That is why
-the \cite{GM98} presents an online algorithm that requires no disk
+\subsection{Algorithm for online incremental maintenance of concise samples}
+The Algorithm \ref{alg:offline-concise-algorithm} requires
+linear number of disk accesses. As a result updating the structures is slow. That is why
+Gibbons and Matias \cite{GM98} present an online algorithm that requires no disk
 accesses and maintains sampling frequency of concise samples that
 reflects distribution of tuples stored in the relation in data base system.
 %TODO maybe describe previous approach ?
 %TODO read the paper by Vitter and compare this work to it.
 The novelty of Gibbons and Matias approach in comparison to previous
 works follows from the fact that this algorithm do not assume that
-sample-size is know up-front (i.e. it differs from the footprint).
+sample-size is know up-front (it can not be determined as it differs from the footprint).
 The sample-size depends not only on the footprint but also on data
 distribution. As distribution in general is not known at the beginning
-and might change in time, it is actually not known how many different
+and might change in time, it is actually not possible to forseen how many different
 samples will be stored. The following algorithm maintains concise
 samples during insertion
 
 \begin{center}
-  \captionof{algorithm}{Incremental maintenance of concise samples.}
+  \captionof{algorithm}{Online incremental maintenance of concise samples.}
     \label{alg:maintenance-concise-algorithm}
     \begin{algorithmic}
     \LineComment{$\tau$ - entry threshold}
