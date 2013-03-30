@@ -1,37 +1,37 @@
 \section{Introduction}
-The increase in data size stored in data warehouse with simultaneous
-requirement to obtain query answers within a reasonable time created a
-need to develop new methods that provide fast approximate
-results. Models that base entirely on direct access to a data
-warehouse turn out to be not efficient enough due to numerous
-operation involving slow disk. There are applications
+The increase in data size stored in data warehouses and simultaneous
+requirement to obtain query answers within a reasonable time creates a
+need to develop new methods that provide fast even only approximated
+results. Techniques that base entirely on direct access to a data
+warehouse appear to be not efficient enough due to numerous
+operation involving slow disk. There are some applications
 for which obtaining results quickly, even if they are only
 approximation, is far better than waiting for slow but exact
-answers. That is the reason for focusing on fast, approximated methods that
-constitute a considerable alternative.
+answer. Therefore, fast and approximated methods
+constitute a considerable alternative for accessing data stored in a
+data warehouse.
 
-Gibbons and Matias \cite{GM98} developed new techniques that try to meet a
-need of users that requires fast, approximated answers. They proposed techniques that use not
+Gibbons and Matias \cite{GM98} proposed techniques that attempt to meet a
+need of users that require fast, approximated answers. Their solution use not
 only data warehouse but also an approximate answer engine.
 The approximate answer engine is responsible for storing
-sample based summary statistics, called \textit{synopsis data
+sample based summary statistics, that are called \textit{synopsis data
   structures} or \textit{synopses}. Instead
-directly to a data warehouse user queries are sent to approximate answer
+directly to a data warehouse, queries are sent to approximate answer
 engine which using \textit{synopses} returns approximate results
 together with accuracy measure.
-The user can estimate usefulness of the query answer and depending on it
+The users can estimate usefulness of the query answer and depending on it
 decide whether to query proper database in order to obtain exact results or not.
-
-The main advantage of approximate query engine is smaller working set.
-Therefore, it can use fast high level memory to return query answers
-which results in much quicker response.
+The advantage of using approximate query engine is smaller working set.
+Therefore, it can use the faster high level memory to return query answers
+which results in immediate response.
 
 The novelty of techniques developed by Gibbons and Matias
-\cite{GM98} base on developing models that provides data sample
-which better reflects distribution of
-data stored in a database and simultaneously maintain small working set.
-This techniques differs from the previous ones in which either the
-entire database is scanned and the approximate answer is updated as
+\cite{GM98} base on models providing samples
+that better reflect distribution of
+data stored in a data warehouses and simultaneously maintain small working set.
+This techniques differ from the previous ones in which either the
+entire data warehouse is scanned and the approximate answer is being updated as
 the scan proceeds or in which data sample is created in the less
 memory efficient way.
 
@@ -39,18 +39,20 @@ The crucial observation is the fact that techniques that provide
 fast response to various type of queries might be developed if the
 frequently used structures are stored in high level memory
 (i.e. memory close to processor like caches or main memory). From this follows
-that it is beneficial to find a way to limit size of used data structures. This is
-the reason for considering the effectiveness of used data structures
-as the function of memory footprint and number of tuples represented
+that it is beneficial to find a way to limit size of used data structures. Therefore,
+it is useful to consider the effectiveness of used data structures
+as a function of memory footprint and the number of tuples represented
 in the sample. Additionally, the measurement of effectiveness
 should take into account two factors - the
 accuracy of the provided answers and the response time.
 
 Main difficulty related to data structures providing approximated answers is
-keeping them up to data as the content of the data warehouse changes.
+keeping them up to date, so that they reflects correctly the content
+of the data warehouse even in presence of changes.
 Gibbons and Matias \cite{GM98} proposed algorithms that let
-maintain synopses data structures up to date in presence of insertion
-and deletion of tuples from data warehouse.
+maintain synopses data structures in presence of insertion
+or deletion of tuples.
+
 
 \subsection{Concise and counting samples}
 Gibbons and Matias \cite{GM98} introduced two new sampling based summary
