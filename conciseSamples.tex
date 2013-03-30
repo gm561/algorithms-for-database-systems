@@ -1,31 +1,30 @@
 \section{Concise Samples}
-
-The number of $\langle value, count \rangle$ pairs or singletons
-$values$ that form the representation of a concise sample depends on the data
-distribution in data warehouse. The approximation engine has to keep track of inserts
-operation and when the occurs update correspondingly its data structures.
-The main difficultly is to recognize, without scanning
-entire data warehouse, when a not tracked value becomes important enough to be
-represented in the sample. Gibbons and Matias suggest a probabilistic
-algorithms that maintains concise sample set within fixed memory
+The number of pairs or singletons values that form a representation
+of a concise sample depends on the data distribution in a data
+warehouse. The approximation answer engine has to keep track of insert
+operations and when they occur update correspondingly its synapses data structures.
+The main difficultly is to recognize without scanning
+an entire data warehouse, when a not yet tracked value becomes
+important enough and should be represented in the sample. Gibbons and
+Matias \cite{GM98} suggest a probabilistic
+algorithms that maintains concise sample within fixed memory
 footprint bound.
 
-As it was already mentioned in the introduction the concise sample
+As it was already mentioned in the introduction a concise sample
 consists of two types of structures. It is
 either a pair $\langle value, count \rangle $ or a singleton value. The first
 type is used for values that occurs in the sample more than once
-(i.e $count > 1$). The values that are present only once in the sample
-are represented by singleton $value$. The motivation for this
-approach is saving space. As a result sample size may be
-much larger than memory footprint of concise sample. Let $S$ denote
-concise sample then we have
+(i.e $count > 1$). The values that are present exactly once in a sample
+are represented by a singleton value. The motivation for this
+approach is saving memory space. As a result size of a sample may be
+much larger than memory footprint of a concise sample. We have that
 \begin{align*}
   S = {\langle v_1, c_1 \rangle, \dots, \langle v_j, c_j \rangle,
     v_{j+1}, \dots, v_l }
 \end{align*}
 is a concise sample where values between $1$ and $j$ are $\langle
 value, count \rangle$ pairs and values $v_{j+1}, \dots, v_l$ are
-singletons, then the we define $sample \hyph size(S)$ as
+singletons. Then we define $sample \hyph size(S)$ as
 \begin{align*}
 sample \hyph size(S) = l - j + \sum_{i=1}^j c_i
 \end{align*}
@@ -34,30 +33,30 @@ and memory $footprint(S)$ as
 footprint(S) = l + j.
 \end{align*}
 
-Gibbons and Matias focus mostly on random
-sample sets of a single attribute of a relation.
+Gibbons and Matias \cite{GM98} focus mostly on random
+samples of a single attribute of a relation.
 They claim that it is possible to generalize this
 approach for samples sets with pair or more attributes. However, it
 leads to much bigger values space i.e $ |R.A_0| \times |R.A_1| \times
 \dots |R.A_N|$ where $|R.A_i|$ denotes the number of possible values taken by
-attribute $A_i$ in relation $R$. A concise sample is treated as a uniform sample of
-size $sample \hyph size(S)$ and might be used in any sample-base method for
-providing approximate query answers.
+attribute $A_i$ in relation $R$. What is more, a concise sample is
+treated as a uniform sample of size $sample \hyph size(S)$ and might
+be used in any sample-base method for providing approximate query answers.
 
 \subsection{Algorithm for offline computation of concise samples }
-Gibbons and Matias \cite{GM98} propose an algorithm that extracts
+Gibbons and Matias \cite{GM98} created an algorithm that extracts
 concise samples from the static relation residing on a disk.
 Let $n$ denote the number of tuples in the relation, $m$ the
-maximum footprint, $t$ a tuple in relation $R$, $t.A$ an attribute $A$
+maximum footprint, $t$ a tuple in a relation $R$, $t.A$ value of an attribute $A$
 of tuple $t$ and $S$ a concise sample. The following algorithm
-compute a concise sample
+computes a concise sample
 
 \begin{center}
-  \captionof{algorithm}{Offline concise sample computation.}
+  \captionof{algorithm}{Offline static concise sample computation.}
     \label{alg:offline-concise-algorithm}
 \begin{algorithmic}
   \State $m \gets$ maximum footprint
-  \State $n \gets$ number of tuples in the relation
+  \State $n \gets$ number of tuples in the relation $R$
   \State $S \gets  \varnothing$
   \While{$footprint(S) \leq m $ or $sample \hyph size(S) \leq n$}
     \State $t \gets$ randomly chosen tuple from the relation $R$
@@ -66,9 +65,9 @@ compute a concise sample
         \State put pair $\langle t.A, 2 \rangle$ to $S$
     \ElsIf {$t.A$ is represented by a pair in $S$}
         \State increase $count$ in $\langle t.A, count
-        \rangle \gets$ by one.
+        \rangle $ by one
     \Else
-        \State add singleton $\angle t.A \rangle$ to $S$
+        \State add singleton $\langle t.A \rangle$ to $S$
     \EndIf
     \EndWhile
   \end{algorithmic}
@@ -76,27 +75,30 @@ compute a concise sample
 
 Let $m'$ be the sample-size of $S$. Then the above algorithm requires
 $O(m')$ number of disk accesses. This algorithm might be seen
-as drawing with replacement - the once drawn tuples are
-not removed and can be drawn again. As a result of the execution of
-Algorithm \ref{alg:offline-concise-algorithm} we obtain
-a sample that is an approximation of tuples distribution in the relation.
+as drawing with replacement - the once drawn tuples are not removed
+and can be drawn again. The result of the execution of Algorithm
+\ref{alg:offline-concise-algorithm} is a sample that is an
+approximation of a distribution of values of an attribute $A$ in the relation $R$.
 
 \subsection{Algorithm for online incremental maintenance of concise samples}
 The Algorithm \ref{alg:offline-concise-algorithm} requires
-linear number of disk accesses. As a result updating the structures is slow. That is why
-Gibbons and Matias \cite{GM98} present an online algorithm that requires no disk
+linear number of disk accesses and creates a sample from the static
+relation. As a result updating the structures is slow and there is no
+efficient methods to update synopses after changes in a data warehouse.
+Therefore, Gibbons and Matias \cite{GM98} created an online algorithm that requires no disk
 accesses and maintains sampling frequency of concise samples that
-reflects distribution of tuples stored in the relation in data base system.
+reflects distribution of tuples stored in a relation in a data warehouse.
 %TODO maybe describe previous approach ?
 %TODO read the paper by Vitter and compare this work to it.
-The novelty of Gibbons and Matias approach in comparison to previous
+The novelty of Gibbons and Matias \cite{GM98} approach in comparison to previous
 works follows from the fact that this algorithm do not assume that
-sample-size is know up-front (it can not be determined as it differs from the footprint).
+sample-size is know up-front (it can not be determined as it in
+general differs from the footprint).
 The sample-size depends not only on the footprint but also on data
-distribution. As distribution in general is not known at the beginning
-and might change in time, it is actually not possible to forseen how many different
-samples will be stored. The following algorithm maintains concise
-samples during insertion
+distribution. As the values distribution might not be known at the beginning
+and might change in time, it is not possible to forseen how many different
+samples will be stored. However, the following online algorithm maintains concise
+sample during insertion of tuples into a relation $R$.
 
 \begin{center}
   \captionof{algorithm}{Online incremental maintenance of concise samples.}
@@ -104,7 +106,6 @@ samples during insertion
     \begin{algorithmic}
     \LineComment{$\tau$ - entry threshold}
     \LineComment{$t$ new added tuple}
-    \LineComment{$S$ current concise sample}
     \Function{AddNewTuple}{$\tau$, $S$, $t$}
     \State {$isAdded \gets$ true  with probability $\frac{1}{\tau}$,
       false otherwise}
@@ -113,7 +114,7 @@ samples during insertion
     \ElsIf{$isAdded = true$ and $t.A$ is a singleton in $S$}
     \State {remove singleton $t.A$ from $S$}
     \State {add $\langle t.A, 2 \rangle$ to $S$}
-    \ElsIf{$isAdded = true$ and $t$ present in $S$}
+    \ElsIf{$isAdded = true$ and $t$ is a pair in $S$}
     \State {increase $count$ by one in the pair $\langle t.A, count \rangle$}
     \EndIf
     \If{footprint of $S > m$}
@@ -121,13 +122,13 @@ samples during insertion
     \EndIf
     \EndFunction
     \State
-    \Function{MakeSpace}{}
-    \State {Raise the threshold to some $\tau'$}
+    \Function{MakeSpace}{ }
+    \State {$\tau' \gets$ raised threshold $\tau$}
     \ForAll{$s$ in $S$}
-    \If{$s$ is a singleton value in $S$}
-    \State {remove s from $S$ with probability
+    \If{$s$ is a singleton in $S$}
+    \State {remove $s$ from $S$ with probability
       $\frac{\tau'}{\tau}$}
-    \ElsIf{$s$ is a pair $\langle value, count \rangle$ in $S$}
+    \ElsIf{$s$ is a pair in $S$}
     \State{$count' \gets 0$}
     \For{$i = 1 \to count$}
     \State{increase $count'$ with probability $\frac{\tau'}{\tau}$}
@@ -147,62 +148,74 @@ samples during insertion
 \end{center}
 
 %TODO add more detail description of the algorithm.
-The key invariant of the \textbf{Algorithm
-  \ref{alg:maintenance-concise-algorithm}} is that each tuple is in
+The key invariant of the Algorithm
+  \ref{alg:maintenance-concise-algorithm} is that each tuple is
 represented in concise sample as if the current value of the threshold
-$\tau$ were always constant. In other words probability of a tuple being
+$\tau$ was always constant. In other words probability of a tuple being
 represented in concise sample is equal $\frac{1}{\tau}$ even if the
-$\tau$ has been changing in the past. Gibbons and Matias \cite{GM98} provide proof
-of this invariant which seems to be not fully correct. Below this
-proof has been sketch.
+$\tau$ that is the current value of the threshold has been changing in
+the past. Gibbons and Matias \cite{GM98} provide proof of this
+invariant which seems to be not fully correct. Below I sketch this
+proof and provide necessary amendment with justifications.
 \begin{theorem}
-Each tuple in the relation is treated as the invariant was always
-$\tau$ even if it has changed from some $\tau'$ to $\tau$.
+Each tuple in the relation is treated as the threshold was always
+$\tau$ even if it has changed from some $\tau'$ to $\tau$ in the past.
 \end{theorem}
 \begin{proof}
 Let $X_{t\tau}$ be an indicator random variable of the event that tuple
-t is in the sample when the threshold is $\tau$. Clearly, we have
+$t$ is in the sample when the threshold is $\tau$. From Algorithm
+\ref{alg:maintenance-concise-algorithm}, we have
 \begin{align*}
-P(X_{t\tau} = 1) = \frac{1}{\tau}
+P(X_{t\tau} = 1) = \frac{1}{\tau}.
 \end{align*}
-The probability of the tuple $t$ to be in the sample after changing a
+The probability of a tuple $t$ to be in the sample after changing a
 threshold to $\tau'$ equals
-
 \begin{align*}
   P(X_{t\tau'} = 1) &= P(X_{t\tau'} = 1 | X_{t\tau} = 1) P(X_{t\tau} = 1)
-  + P(X_{t\tau'} = 1 | X_{t\tau} = 1) P(X_{t\tau} = 1) \\
+  + P(X_{t\tau'} = 1 | X_{t\tau} = 0) P(X_{t\tau} = 0) \\
   &=  P(X_{t\tau'} = 1 | X_{t\tau} = 1) P(X_{t\tau} = 1) \\
   &= \frac{\tau}{\tau'} \frac{1}{\tau} = \frac{1}{\tau'}.
 \end{align*}
 \end{proof}
-Hence, if the current threshold is $\tau$, the probability of a tuple
-to be in the sample equals $\frac{1}{\tau}$ . The only problem
-with this proof is that the authors in \cite{GM98} define the
-probability of evicting a sample to be
+Hence, if the current threshold is $\tau$, the probability of a value
+,associated with some tuple, to be in the sample equals $\frac{1}{\tau}$. The problem
+with this proof contained in the paper written by Gibbons and Matias
+\cite{GM98} is that the authors define the
+probability of evicting a sample point given that it is before raising
+a threshold in the sample to be
 \begin{align*}
 P(X_{t\tau'} = 0 | X_{t\tau} = 1) = \frac{\tau}{\tau'}.
 \end{align*}
 It also follows from the
-\textbf{Algorithm \ref{alg:maintenance-concise-algorithm}}. I assume
-that this is just a slight inconsistency and in fact a tuple after
-change of threshold should
+Algorithm \ref{alg:maintenance-concise-algorithm} but this would lead
+to incorrectness in this above proof. Hence, I assume
+that this is just a slight inconsistency and in fact a value after
+change of the threshold should
 remain in the sample given that it is in the sample before the
-threshold was changed with probability $\frac{\tau'}{\tau}$.
+threshold was changed with probability $\frac{\tau'}{\tau}$. It means
+that the probability of evicting a sample point given that it is before raising
+a threshold in the sample should be
+\begin{align*}
+ P(X_{t\tau'} = 0 | X_{t\tau} = 1) = 1 - \frac{\tau}{\tau'}.
+\end{align*}
 
-It is possible that flipping a coin for each insertion of new data can
-create certain overhead. Basing on the reservoir sampling Algorithm X
-\cite{Vit85} Gibbons and Matias propose an approach in which a coin is
-flipped in order to determine how many consecutive inserts will be
-omitted. This idea bases on generating a value for a random
-variable with give distribution. As it is known that the probability
+The random experiment in Algorithm
+\ref{alg:maintenance-concise-algorithm} of deciding whether to add or remove a value associated
+with a tuple might be seen as flipping a biased coin with head
+probability $\frac{1}{\tau}$. This random experiment done for
+each insertion of new data can create certain overhead. Basing on the
+reservoir sampling Algorithm X \cite{Vit85} Gibbons and Matias propose
+an approach in which actually a coin is flipped in order to determine how many
+consecutive inserts will be omitted. This idea bases on generating a value for a random
+variable with give distribution. Let define random variable $X$ to
+be the number of coin flips till the first head. As it is known that the probability
 of skipping over exactly next $i$ elements is
 \begin{align*}
-P(\text{skip over exactly next $i$ elements}) = \left( 1 - \frac{1}{\tau}\right)^i\frac{1}{\tau}
+P(X = i) = \left( 1 - \frac{1}{\tau}\right)^i\frac{1}{\tau}.
 \end{align*}
-%TODO describe algorihtm for skipping over elements described in
-%vitter...
-%TODO add an example that show exponential advantage of concise
-%samples page 334.
+Hence, we know the distribution of a random variable $X$. Using
+well known methods described in \cite{Vit85} it is possible to
+generate values that $X$ takes on in the random experiment.
 
 \subsection{Experimental evaluation}
 Gibbons and Matias \cite{GM98} compared the Algorithms
