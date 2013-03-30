@@ -1,21 +1,21 @@
 \section{Introduction}
 The increase in data size stored in data warehouses and simultaneous
-requirement to obtain query answers within a reasonable time creates a
-need to develop new methods that provide fast even only approximated
+requirement to obtain query answers within a reasonable time create a
+need to develop new methods that provide fast but approximated
 results. Techniques that base entirely on direct access to a data
 warehouse appear to be not efficient enough due to numerous
-operation involving slow disk. There are some applications
+operation involving slow disk. There are applications
 for which obtaining results quickly, even if they are only
-approximation, is far better than waiting for slow but exact
+approximation, is far better than long waiting for an exact
 answer. Therefore, fast and approximated methods
 constitute a considerable alternative for accessing data stored in a
 data warehouse.
 
-Gibbons and Matias \cite{GM98} proposed techniques that attempt to meet a
-need of users that require fast, approximated answers. Their solution use not
-only data warehouse but also an approximate answer engine.
+New techniques proposed by Gibbons and Matias \cite{GM98} attempt to meet a
+need of users that require fast, approximated answers. They use not
+only a data warehouse but also an approximate answer engine.
 The approximate answer engine is responsible for storing
-sample based summary statistics, that are called \textit{synopsis data
+sample based summary statistics that are called \textit{synopsis data
   structures} or \textit{synopses}. Instead
 directly to a data warehouse, queries are sent to approximate answer
 engine which using \textit{synopses} returns approximate results
@@ -23,7 +23,7 @@ together with accuracy measure.
 The users can estimate usefulness of the query answer and depending on it
 decide whether to query proper database in order to obtain exact results or not.
 The advantage of using approximate query engine is smaller working set.
-Therefore, it can use the faster high level memory to return query answers
+Therefore, it can use faster high level memory to return query answers
 which results in immediate response.
 
 The novelty of techniques developed by Gibbons and Matias
@@ -32,8 +32,8 @@ that better reflect distribution of
 data stored in a data warehouses and simultaneously maintain small working set.
 This techniques differ from the previous ones in which either the
 entire data warehouse is scanned and the approximate answer is being updated as
-the scan proceeds or in which data sample is created in the less
-memory efficient way.
+the scan proceeds \cite{HHW97} or in which data sample is created in the less
+memory efficient way \cite{Vit85}.
 
 The crucial observation is the fact that techniques that provide
 fast response to various type of queries might be developed if the
@@ -41,53 +41,50 @@ frequently used structures are stored in high level memory
 (i.e. memory close to processor like caches or main memory). From this follows
 that it is beneficial to find a way to limit size of used data structures. Therefore,
 it is useful to consider the effectiveness of used data structures
-as a function of memory footprint and the number of tuples represented
+as a function of memory footprint and the total number of values represented
 in the sample. Additionally, the measurement of effectiveness
 should take into account two factors - the
 accuracy of the provided answers and the response time.
 
 Main difficulty related to data structures providing approximated answers is
-keeping them up to date, so that they reflects correctly the content
-of the data warehouse even in presence of changes.
-Gibbons and Matias \cite{GM98} proposed algorithms that let
+keeping them up to date so that they reflect correctly the content
+of a data warehouse even in presence of changes.
+Gibbons and Matias \cite{GM98} propose randomized algorithms that let
 maintain synopses data structures in presence of insertion
 or deletion of tuples.
 
-
 \subsection{Concise and counting samples}
-Gibbons and Matias \cite{GM98} introduced two new sampling based summary
-statistics - concise samples and counting
-  samples. However the basic idea behind this methods is simple, it
-also requires development of algorithms for fast incremental
-maintenance of this structures in face of frequent updates of data
-warehouse.
+Gibbons and Matias \cite{GM98} introduce two new sampling based summary
+statistics, concise samples and counting samples. However the basic
+idea behind this methods is simple, they additionally require finding
+algorithms for fast incremental maintenance of this structures in face
+of frequent updates of tuples in data warehouse.
 
-The concise samples and counting samples focus on the class of queries
-that ask for a one or more attributes of a single data relation.
+% The concise samples and counting samples focus on the class of queries
+% that ask for a one or more attributes of a single data relation.
 
 The previous solutions like the one proposed by Vitter \cite{Vit85}
 base on selecting a random set of tuples from the relation.
 This sample set establish an approximation of distribution of values
-in a relation. The quality of the representation depends on the size of
-the sample. Gibbons and Matias observed that the frequently occurring values in the
-sample lead to inefficient use of space and hence, it representation
-is not optimal.
+in a relation. The quality of representation depends highly on the size of
+the sample. Gibbons and Matias \cite{GM98} observed that frequently occurring values in the
+sample lead to inefficient use of space and it is possible to find
+better representation.
 They proposed an alternative way to represent frequently occurring
-value in the sample as a pair $\langle value, count \rangle$ where
+value in the sample as a pair $\langle value, count \rangle$, where
 $value$ is a value of an attribute in a relation and $count$ is the
-number of this value copies in the sample. If the attribute value is
+number of value copies in the sample. If the relation attribute is
 represented by a type that size is equal to an integer numeric
-type the same that is used to represent $count$, then a single pair
-save space for $count - 2$ additional points.
+type used to represent $count$, then a single pair
+save space for $count - 2$ additional sample points.
 
-This idea is a base for concise sample data structure. Formally,
-concise sample is defined as a uniform
+This idea is a base for concise samples data structure. Formally,
+a concise sample is defined as a uniform
 random sample of the data set such that values appearing more than
-once in the sample are represented as a value and a count pair which
+once in the sample are represented as a value, count pair which
 is denoted further as $\langle value, count \rangle$. If the
 value occurs exactly once in the sample it is represented as a
-singleton value, is denote by $value$ and its size is the same as a
-single the size of a single data point.
+singleton value and is denote by $value$.
 
 % Gibbons and
 % Matias argues that this simple method is powerful as
@@ -99,29 +96,30 @@ single the size of a single data point.
 % approximation answer, as the saved memory might be used for additional
 % samples. Hence, the result is more accurate.
 
-The second technique proposed in the paper \cite{GM98} are
+A second structure proposed by Gibbons and Matias \cite{GM98} are
 counting samples. They are conceptually similar to concise
 samples as they also make use of representation of frequently
-occurring values in the samples as $\langle value, count \rangle$ but
-provides more flexibility. In particular counting samples work also in
-presence of delation of tuples from the data warehouse which is not
-possible when concise samples are used.
+occurring values in the samples as pairs and rarely as singletons.
+Counting samples provide more flexibility. In particular they work also in
+presence of delation of tuples from a data warehouse which is hard to
+achieve when concise samples are used.
 
 \subsection{Previous techniques}
-Already before 1998 when Gibbons and Matias published their paper
-there had been known some techniques for obtaining
-approximate query answers. One of them was online aggregation
+Already before inventing by Gibbons and Matias \cite{GM98} concise and
+counting samples there had been known some techniques for obtaining
+approximate query answers. One of them is online aggregation
 proposed by Hellerstein, Hass and Wang \cite{HHW97}. This
-framework based technique relaying on scanning database on random.
+framework based technique relays on scanning database on random.
 The approximate answer is being developed
 and displayed to the user together with confidence interval. It is
-possible to stop the scan in any time. This technique requires access
-to disk memory and algorithms to access tuples of
-relation randomly, which makes it less efficient.
+possible to stop the scan in any time. This technique requires
+algorithms for selecting random tuples of relation and frequently access
+disk, which makes it in general less efficient.
 
-Another approach proposed by Vitter \cite{Vit85} is
-similar to concise and counting samples. It creates a sample of tuples
-of a relation. Nevertheless, it less memory efficient as each value is
-represented independently and does not provide accumulated pairs as
-in the methods developed by Gibbons and Matias.
+An another approach is proposed by Vitter \cite{Vit85}. It is
+similar to concept of concise and counting samples as it also creates
+a sample of attribute values of a relation. Nevertheless, it less
+memory efficient as each value is represented independently and does
+not provide accumulated pairs as in the methods developed by Gibbons
+and Matias \cite{GM98}.
 
