@@ -72,4 +72,79 @@ indicates that the value should be reported as a \textit{hot list
   query}. Intuitively the higher the $\sigma$ that less possible is
 that a relatively rarely represented value is listed as hot query. On
 the other hand the higher it is more likely that the sample provides
-less than $k$ values. It is interesting to estimate probability for 
+less than $k$ values.
+
+\subsubsection{Probabilistic analysis of concise samples}
+It is interesting to estimate probability of some events.
+First of all let us analyze an event that some frequently occurring value in
+relation $R$ will be reported on the hot list queries. Let $v$ denote a
+value that occurs $f_v = \frac{\tau \delta}{1 - \varepsilon}$
+times. We define $X_{vi}$ to be Bernoulli distributed indicator random
+variable for the event that $i$th occurrence of value $v$ is in the
+concise sample. We denote threshold by $\tau$. We have for
+every $i$ such that $1 \leq i \leq f_v$ that
+\begin{align*}
+\mathbb{E}[X_{vi}] = \frac{1}{\tau}.
+\end{align*}
+Let
+\begin{align*}
+  X = \sum_{i = 1}^{f_v} X_{vi}.
+\end{align*}
+By linearity of expectation, we have
+\begin{align*}
+  \mathbb{E}[X]
+  = \mathbb{E}[\sum_{i=1}^{f_v} X_{vi}] = \sum_{i=1}^{f_v}
+  \mathbb{E}[X_{vi}] = \frac{f_v}{\tau}
+\end{align*}
+%
+Using Chernoff bounds yields
+\begin{align*}
+  P[X \leq (1-\varepsilon)E[X]] \leq e^{\frac{-\varepsilon^2 E[X]
+    }{2}} = e^{\frac{-\delta \varepsilon}{2(1-\varepsilon)}}.
+\end{align*}
+Hence, we have that
+\begin{align*}
+  P[X \geq (1-\varepsilon)\mathbb{E}[X]] = 1 - P[X \leq
+  (1-\varepsilon)\mathbb{E}[X]] \geq 1 - e^{\frac{-\delta \varepsilon}{2(1-\varepsilon)}}.
+\end{align*}
+Which means that is not likely to not report a value to the hot list
+query that is frequent.
+On the other hand it is possible to do similar calculations for the
+case when value is infrequent. Let assume that value $v$ occurs at
+most $f_v = \frac{\tau\delta}{1-\varepsilon}$ and the threshold equals
+$\tau$. Simililarly as above the expectation is computed.
+That probability of infrequently occurring value being reported to hot
+list query is computed using the Chernoff bound.  Hence, we have
+\begin{align*}
+P[X \geq (1+\varepsilon)\mathbb{E}[X]] \leq e^{-\frac{\varepsilon^2
+    E[X]}{3} } = e^{-\frac{\delta \varepsilon^2}{3(1+\varepsilon)}}.
+\end{align*}
+
+\subsubsection{Analysis of counting samples}
+The value of $\widetilde{c}$ is determined as follows. Let $c_v$ be a
+count for some value $v$ reported in the sample and $f_v$ be the
+number of times the value $v$ occurs in the relation. We want to choose
+$\widetilde{c}$ such that $Est_v = c_v + \widetilde{c}$ is close to
+$f_v$. More precisely we want that $\mathbb{E}[Est_v | v\text{ is in }S] = f_v$. Linearity of
+expectation yields
+\begin{align*}
+  \mathbb{E}[Est_v | v \text{is in} S] = \widetilde{c} + \sum_{i = 1} ^ {f_v}
+  (f_v - i + 1) Pr[v \text{ was inserted at the $i$th occurrence $|$ $v$ is
+  in $S$}]
+\end{align*}
+Which after some calculations gives
+\begin{align*}
+  \widetilde{c} \approx \tau - 1 - f_v \frac{(1/e)^{\frac{f_v}
+      {\tau}}} {1 - (1/e)^{\frac{f_v}{\tau}}}
+\end{align*}
+This calculations still does not give an answer how to choose
+$\widetilde(c)$ as $f_v$ is not know. Gibbons and Matias suggest to
+choose $\widetilde{c}$ as if $f_v = \tau$.
+
+\subsubsection{Number of reported values}
+The aforementioned algorithms reports less than $k$ values for certain
+distributions. Gibbons and Matias claim that any randomized algorithm
+will fail to approximate the frequency exactly. However, the
+distribution for which it is likely are the one close to the uniform
+distribution and it is rarely interesting to ask for a hot list
+queries for this distributions.
